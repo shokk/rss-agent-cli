@@ -37,6 +37,7 @@ var fetchCmd = &cobra.Command{
 		plain, _ := cmd.Flags().GetBool("plain")
 		workers, _ := cmd.Flags().GetInt("workers")
 		limit, _ := cmd.Flags().GetInt("limit")
+		autoQuit, _ := cmd.Flags().GetBool("auto-quit")
 
 		cfg, err := loadCfg(configPath)
 		if err != nil {
@@ -79,14 +80,14 @@ var fetchCmd = &cobra.Command{
 		opts := fetcher.FetchOptions{Limit: limit}
 
 		if !plain && tui.ShouldUseTUI() {
-			return runInteractiveFetch(ctx, cfg, queries, aiProcessor, workers, opts)
+			return runInteractiveFetch(ctx, cfg, queries, aiProcessor, workers, opts, autoQuit)
 		}
 
 		return runPlainFetch(ctx, cmd, cfg, queries, aiProcessor, opts)
 	},
 }
 
-func runInteractiveFetch(ctx context.Context, cfg *config.Config, queries *database.Queries, aiProcessor processor.AIProcessor, workers int, opts fetcher.FetchOptions) error {
+func runInteractiveFetch(ctx context.Context, cfg *config.Config, queries *database.Queries, aiProcessor processor.AIProcessor, workers int, opts fetcher.FetchOptions, autoQuit bool) error {
 	if workers <= 0 {
 		workers = runtime.NumCPU()
 	}
@@ -96,7 +97,7 @@ func runInteractiveFetch(ctx context.Context, cfg *config.Config, queries *datab
 		sourceNames[i] = source.Name
 	}
 
-	model := fetchui.New(sourceNames)
+	model := fetchui.New(sourceNames, autoQuit)
 	model.SetWorkerCount(workers)
 
 	program := tea.NewProgram(model, tea.WithAltScreen())
@@ -217,5 +218,6 @@ func init() {
 	fetchCmd.Flags().Bool("plain", false, "Use plain text output instead of interactive TUI")
 	fetchCmd.Flags().IntP("workers", "w", 0, "Number of worker goroutines (0 = auto-detect based on CPU cores)")
 	fetchCmd.Flags().IntP("limit", "n", 5, "Maximum number of articles to fetch per source (0 = unlimited)")
+	fetchCmd.Flags().Bool("auto-quit", false, "Automatically quit after fetch completes instead of waiting for user input")
 	rootCmd.AddCommand(fetchCmd)
 }

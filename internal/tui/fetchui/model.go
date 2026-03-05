@@ -37,9 +37,10 @@ type Model struct {
 	width        int
 	height       int
 	workerCount  int
+	autoQuit     bool
 }
 
-func New(sourceNames []string) Model {
+func New(sourceNames []string, autoQuit bool) Model {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 	s.Style = tui.SpinnerStyle
@@ -60,6 +61,7 @@ func New(sourceNames []string) Model {
 		spinner:      s,
 		workerCount:  runtime.NumCPU(),
 		totalSources: len(sourceNames),
+		autoQuit:     autoQuit,
 	}
 }
 
@@ -163,6 +165,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.successCount = msg.SuccessCount
 		m.errorCount = msg.ErrorCount
 		m.errors = msg.Errors
+		if m.autoQuit {
+			return m, tea.Quit
+		}
 	}
 
 	return m, tea.Batch(cmds...)
