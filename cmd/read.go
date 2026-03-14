@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/robertguss/rss-agent-cli/internal/article"
+	"github.com/robertguss/rss-agent-cli/internal/config"
 	"github.com/robertguss/rss-agent-cli/internal/state"
 	"github.com/spf13/cobra"
 )
@@ -39,6 +40,10 @@ func runRead(cmd *cobra.Command, args []string) error {
 
 	noStyle, _ := cmd.Flags().GetBool("no-style")
 	noCache, _ := cmd.Flags().GetBool("no-cache")
+
+	if cfg, err := config.Load(); err == nil {
+		article.SetUserAgent(cfg.UserAgent)
+	}
 
 	vs, err := state.Load()
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 )
 
 var jinaEndpoint = "https://r.jina.ai/%s"
+var userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15"
 var httpClient = &http.Client{
 	Timeout: 30 * time.Second,
 }
@@ -18,6 +19,11 @@ func SetJinaEndpointForTesting(endpoint string) string {
 	old := jinaEndpoint
 	jinaEndpoint = endpoint
 	return old
+}
+
+// SetUserAgent sets the User-Agent header used when fetching articles.
+func SetUserAgent(ua string) {
+	userAgent = ua
 }
 
 func FetchArticle(ctx context.Context, articleURL string, noCache bool) (string, error) {
@@ -31,7 +37,7 @@ func FetchArticle(ctx context.Context, articleURL string, noCache bool) (string,
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
 
-	req.Header.Set("User-Agent", "rss-agent-cli/1.0")
+	req.Header.Set("User-Agent", userAgent)
 
 	resp, err := httpClient.Do(req)
 	if err != nil {

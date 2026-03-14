@@ -35,6 +35,7 @@ type Config struct {
 	BackoffMaxMs   int           `mapstructure:"backoff_max_ms"`
 	DBBusyRetries  int           `mapstructure:"db_busy_retries"`
 	LogFile        string        `mapstructure:"log_file"`
+	UserAgent      string        `mapstructure:"user_agent"`
 }
 
 // Load loads the application configuration from the default config.yaml file.
@@ -144,6 +145,14 @@ func setDefaults(cfg *Config) {
 			cfg.AI.GeminiModel = model
 		} else {
 			cfg.AI.GeminiModel = "gemini-1.5-flash"
+		}
+	}
+
+	if cfg.UserAgent == "" {
+		if ua := os.Getenv("USER_AGENT"); ua != "" {
+			cfg.UserAgent = ua
+		} else {
+			cfg.UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15"
 		}
 	}
 }

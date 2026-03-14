@@ -1,5 +1,8 @@
 dsn: "./ai-news.db"
 
+# User-Agent header sent when fetching articles via Jina Reader.
+# user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15"
+
 ai:
   # Available models: gemini-1.5-flash, gemini-1.5-pro, gemini-2.5-flash, gemini-2.5-pro, etc.
   # For full list, see: https://ai.google.dev/gemini-api/docs/models/gemini
